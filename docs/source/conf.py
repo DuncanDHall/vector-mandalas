@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Vector Mandalas documentation build configuration file, created by
-# sphinx-quickstart on Sun Jan 28 14:03:31 2018.
+# sphinx-quickstart on Sun Jan 28 15:00:08 2018.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -71,7 +71,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
