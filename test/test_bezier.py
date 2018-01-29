@@ -42,6 +42,11 @@ class TestCubicBezierCurve(unittest.TestCase):
         cubic_curve = CubicBezierCurve(self.start, self.end, self.cp1, self.cp2)
 
 
+class TestPath(unittest.TestCase):
+    """ Bezier Path tests """
+    pass
+
+
 class TestCurveChecker(unittest.TestCase):
     """ CurveChecker tests """
     def setUp(self):
@@ -103,27 +108,20 @@ class TestCurveChecker(unittest.TestCase):
         )
 
 
-class TestPath(unittest.TestCase):
+class TestSVGPathConverter(unittest.TestCase):
     """ SVGPathConverter tests """
-    def setUp(self):
-        self.curve1 = CubicBezierCurve(
-            Point(10, 10), Point(30, 10),
-            Point(10, 30), Point(30, 30)
-        )
-
-        self.curve2 = CubicBezierCurve(
-            Point(30, 10), Point(50, 30),
-            Point(50, 30), Point(50, 30)
-        )
-
-    def test_1(self):
-        """ Path creation """
-        path = Path([self.curve1, self.curve2], require_differentiable=False)
-
-    def test_2(self):
-        """ Adding to a path """
-        path = Path([self.curve1])
-        path.add_curves(self.curve2, require_differentiable=False)
+    pass
+    # def test_1(self):
+    #     curve1 = CubicBezierCurve(
+    #         Point(10, 30), Point(30, 30),
+    #         Point(10, 10), Point(30, 10)
+    #     )
+    #     curve2 = CubicBezierCurve(
+    #         Point(30, 30), Point(10, 50),
+    #         Point(30, 50), Point(30, 50)
+    #     )
+    #     path = Path([curve1, curve2])
+    #     SVGPathConverter.path_to_string(path)
 
 
 if __name__ == '__main__':

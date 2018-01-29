@@ -12,9 +12,14 @@ from typing import List
 import numpy as np
 
 
+##############################
+# Basic Objects              #
+##############################
+
+
 class Point:
     """ Describes a point in 2D cartesian space """
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: int, y: int) -> None:
         """ Initialization of each dimension
         Args:
             x (int): int value for horizontal dimension (higher values right)
@@ -31,13 +36,13 @@ class Point:
         """ Allow __eq__ for point comparison """
         if isinstance(o, Point):
             return self.x == o.x and self.y == o.y
-        return super(self).__eq__(o)
+        return super().__eq__(o)
 
 
 class CubicBezierCurve:
     """ Describes a cubic bezier curve with two endpoints
         and two control points """
-    def __init__(self, p1: Point, p2: Point, c1: Point = None, c2: Point = None):
+    def __init__(self, p1: Point, p2: Point, c1: Point = None, c2: Point = None) -> None:
         """ Initialization of each point
         Args:
             p1 (Point): first endpoint
@@ -49,6 +54,21 @@ class CubicBezierCurve:
         self.p2 = p2
         self.c1 = c1 if c1 is not None else p1
         self.c2 = c2 if c2 is not None else c2
+
+
+class Path(List[CubicBezierCurve]):
+    """ A collection of connected bezier curves. This class also includes
+        methods for construction and addition of curves to the path. Note
+        that this path is ordered.
+
+        Right now this is literally a list, but there may be more specific
+        functionality called for in the future. """
+    pass
+
+
+##############################
+#
+##############################
 
 
 class GeometryChecker:
@@ -119,51 +139,6 @@ class GeometryChecker:
             if not GeometryChecker.assert_collinear(curve1.c2, curve2.p1, curve2.c1):
                 return False
         return True
-
-
-class PathError(Exception):
-    pass
-
-
-class Path:
-    """ A collection of connected bezier curves. This class also includes
-        methods for construction and addition of curves to the path.
-
-    .. note::
-        The path is ordered, and verifies that curves are contiguous """
-    def __init__(self, curves: List[CubicBezierCurve] = None, require_differentiable: bool = True):
-        """ Initialization of a list of bezier curves
-
-        Args:
-            curves (List[CubicBezierCurve]): curves included in the path (defaults to empty)
-            require_differentiable (bool): can be used to allow creation of nondifferentiable paths
-        """
-        self.curves: List[CubicBezierCurve] = []
-        if curves is not None:
-            self.add_curves(*curves, require_differentiable=require_differentiable)
-
-    def add_curves(self, *curves: CubicBezierCurve, require_differentiable: bool = True):
-        """ Used to add curves to the path
-
-        Args:
-            *curves (CubicBezierCurve) curves to be added to the path
-            require_differentiable (bool): turns on/off checking for differentiability (default on)
-        """
-        candidate_curves = self.curves + list(curves)
-
-        if require_differentiable:
-            if not GeometryChecker.assert_differentiable(*candidate_curves):
-                raise PathError(
-                    "Non-differentiable curves added to a path must be explicitly allowed with \
-`require_differentiable = False`"
-                )
-        else:
-            if not GeometryChecker.assert_continuous(*candidate_curves):
-                raise PathError(
-                    "Non-continuous curves cannot be added to a Path"
-                )
-
-        self.curves.extend(curves)
 
 
 class SVGPathConverter:
