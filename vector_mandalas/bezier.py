@@ -68,97 +68,95 @@ class Path(List[CubicBezierCurve]):
 
 
 ##############################
-# Functional Things          #
+# Functions                  #
 ##############################
 
 
-class GeometryChecker:
-    """ Used to check continuity and differentiability """
-    @staticmethod
-    def assert_continuous(*curves: CubicBezierCurve) -> bool:
-        """ Compares each curve with the next to verify continuity. Note that this
-            function treats curves as directed, thus two curves that start at the
-            same point will return `False` when compared.
-
-            Args:
-                *curves (CubicBezierCurve): the curves to compare
-        """
-        if not curves:
-            raise ValueError("CurveChecker.assert_continuous() cannot be called on an empty list")
-
-        previous_curve = curves[0]
-        for curve in curves[1:]:
-            if previous_curve.p2 != curve.p1:
-                return False
-            previous_curve = curve
-        return True
-
-    @staticmethod
-    def assert_collinear(*points: Point, tolerance: float = 1e-2) -> bool:
-        """ Verifies that the adjacent slopes between points are within specified
-            tolerance of one another. Note that assert_collinear assumes ordered
-            points; three actually collinear points passed with the middle point as
-            the first or last argument will return `False`
-
-            Much appreciation to phrogz.net/angle-between-three-points for the
-            method of angle calculation.
+def assert_continuous(*curves: CubicBezierCurve) -> bool:
+    """ Compares each curve with the next to verify continuity. Note that this
+        function treats curves as directed, thus two curves that start at the
+        same point will return `False` when compared.
 
         Args:
-            *points (Point): the points to be compared
-            tolerance (float): the error tolerance in radians between adjacent
-                slopes (defaults to 0.01)
-        """
-        if len(points) < 3:
-            raise ValueError("CurveChecker.assert_collinear() must be called with at least three points")
+            *curves (CubicBezierCurve): the curves to compare
+    """
+    if not curves:
+        raise ValueError("CurveChecker.assert_continuous() cannot be called on an empty list")
 
-        for p1, p2, p3 in zip(points, points[1:], points[2:]):
-            d12 = np.hypot(p1.x-p2.x, p1.y-p2.y)
-            d23 = np.hypot(p2.x-p3.x, p2.y-p3.y)
-            d31 = np.hypot(p3.x-p1.x, p3.y-p1.y)
+    previous_curve = curves[0]
+    for curve in curves[1:]:
+        if previous_curve.p2 != curve.p1:
+            return False
+        previous_curve = curve
+    return True
 
-            theta = np.arccos(0.5 * (d12/d23 + d23/d12 - d31**2/(d12*d23)))
-            if np.pi - theta > tolerance:
-                return False
 
-        return True
+def assert_collinear(*points: Point, tolerance: float = 1e-2) -> bool:
+    """ Verifies that the adjacent slopes between points are within specified
+        tolerance of one another. Note that assert_collinear assumes ordered
+        points; three actually collinear points passed with the middle point as
+        the first or last argument will return `False`
 
-    @staticmethod
-    def assert_differentiable(*curves: CubicBezierCurve) -> bool:
-        """ Verifies differentiability of curves by checking collinearity of adjacent
-            curves' control points
+        Much appreciation to phrogz.net/angle-between-three-points for the
+        method of angle calculation.
 
-        Args:
-            *curves (CubicBezierCurve): curves to be compared
-        """
-        if not curves:
-            raise ValueError("CurveChecker.assert_differentiable() cannot be called on an empty list")
+    Args:
+        *points (Point): the points to be compared
+        tolerance (float): the error tolerance in radians between adjacent
+            slopes (defaults to 0.01)
+    """
+    if len(points) < 3:
+        raise ValueError("CurveChecker.assert_collinear() must be called with at least three points")
 
-        if not GeometryChecker.assert_continuous(*curves):
+    for p1, p2, p3 in zip(points, points[1:], points[2:]):
+        d12 = np.hypot(p1.x-p2.x, p1.y-p2.y)
+        d23 = np.hypot(p2.x-p3.x, p2.y-p3.y)
+        d31 = np.hypot(p3.x-p1.x, p3.y-p1.y)
+
+        theta = np.arccos(0.5 * (d12/d23 + d23/d12 - d31**2/(d12*d23)))
+        if np.pi - theta > tolerance:
             return False
 
-        for curve1, curve2 in zip(curves, curves[1:]):
-            if not GeometryChecker.assert_collinear(curve1.c2, curve2.p1, curve2.c1):
-                return False
-        return True
+    return True
 
 
-class SVGPathConverter:
-    """ Used to create an SVG11 string representation of a path as
-        described here: https://www.w3.org/TR/SVG11/paths.html """
+def assert_differentiable(*curves: CubicBezierCurve) -> bool:
+    """ Verifies differentiability of curves by checking collinearity of adjacent
+        curves' control points
 
-    @staticmethod
-    def path_to_string(path: Path) -> str:
-        """ Converts a path to a string representation for inclusion in an SVG file.
-            Verifies that the path is continuous. """
-        GeometryChecker.assert_continuous(*iter(path))  # TODO: is casting necessary?
+    Args:
+        *curves (CubicBezierCurve): curves to be compared
+    """
+    if not curves:
+        raise ValueError("CurveChecker.assert_differentiable() cannot be called on an empty list")
 
-        pieces = ["M {} {}".format(path[0].p1.x, path[0].p1.y)]
-        for curve in iter(path):
-            piece = " C {} {} {} {} {} {}".format(
-                curve.c1.x, curve.c1.y,
-                curve.c2.x, curve.c2.y,
-                curve.p2.x, curve.p2.y
-            )
-            pieces.append(piece)
+    if not assert_continuous(*curves):
+        return False
 
-        return "".join(pieces)
+    for curve1, curve2 in zip(curves, curves[1:]):
+        if not assert_collinear(curve1.c2, curve2.p1, curve2.c1):
+            return False
+    return True
+
+
+def path_to_string(path: Path) -> str:
+    """ Converts a path to a string representation for inclusion in an SVG file as
+        described here: https://www.w3.org/TR/SVG11/paths.html
+
+        Verifies that the path is continuous.
+
+        Args:
+            path (List[CubicBezierCurve]): path to convert
+    """
+    assert_continuous(path)  # TODO: is casting necessary?
+
+    pieces = ["M {} {}".format(path[0].p1.x, path[0].p1.y)]
+    for curve in path:
+        piece = "C {} {} {} {} {} {}".format(
+            curve.c1.x, curve.c1.y,
+            curve.c2.x, curve.c2.y,
+            curve.p2.x, curve.p2.y
+        )
+        pieces.append(piece)
+
+    return " ".join(pieces)
