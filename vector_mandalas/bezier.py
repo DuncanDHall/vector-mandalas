@@ -1,5 +1,5 @@
 """
-.. module:: vector_mandalas
+.. module:: bezier
     :platform: OS X
     :synopsis: module for creation of cool vector graphics
 
@@ -148,10 +148,10 @@ def path_to_string(path: Path) -> str:
         Args:
             path (List[CubicBezierCurve]): path to convert
     """
-    assert_continuous(path)  # TODO: is casting necessary?
+    assert_continuous(path)
 
     pieces = ["M {} {}".format(path[0].p1.x, path[0].p1.y)]
-    for curve in path:
+    for curve in iter(path):  # iter cast not strictly necessary
         piece = "C {} {} {} {} {} {}".format(
             curve.c1.x, curve.c1.y,
             curve.c2.x, curve.c2.y,
