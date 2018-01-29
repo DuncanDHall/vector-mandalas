@@ -62,7 +62,8 @@ class Path(List[CubicBezierCurve]):
         that this path is ordered.
 
         Right now this is literally a list, but there may be more specific
-        functionality called for in the future. """
+        functionality called for in the future. It would also be really
+        nice to be able to specify a type hint here... """
     pass
 
 
@@ -147,6 +148,17 @@ class SVGPathConverter:
 
     @staticmethod
     def path_to_string(path: Path) -> str:
-        """ Converts a path to a string representation for inclusion in an SVG file """
-        # TODO
-        return ""
+        """ Converts a path to a string representation for inclusion in an SVG file.
+            Verifies that the path is continuous. """
+        GeometryChecker.assert_continuous(*iter(path))  # TODO: is casting necessary?
+
+        pieces = ["M {} {}".format(path[0].p1.x, path[0].p1.y)]
+        for curve in iter(path):
+            piece = " C {} {} {} {} {} {}".format(
+                curve.c1.x, curve.c1.y,
+                curve.c2.x, curve.c2.y,
+                curve.p2.x, curve.p2.y
+            )
+            pieces.append(piece)
+
+        return "".join(pieces)

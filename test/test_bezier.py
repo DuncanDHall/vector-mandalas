@@ -7,18 +7,18 @@ class TestPoint(unittest.TestCase):
     def test_1(self):
         """ Point creation """
         p = Point(10, 20)
-        assert p.x == 10
-        assert p.y == 20
+        self.assertEqual(10, p.x)
+        self.assertEqual(20, p.y)
 
     def test_2(self):
         """ Point Copying """
         p1 = Point(1, 2)
         p2 = p1.copy()
-        assert p1 is not p2
+        self.assertIsNot(p1, p2)
 
         p3 = p1.copy(2, 2)
-        assert p3.x == 3
-        assert p3.y == 4
+        self.assertEqual(3, p3.x)
+        self.assertEqual(4, p3.y)
 
 
 class TestCubicBezierCurve(unittest.TestCase):
@@ -61,16 +61,16 @@ class TestCurveChecker(unittest.TestCase):
             Point(30, 40), Point(10, 60),
             Point(30, 60), Point(30, 60)
         )
-        assert not GeometryChecker.assert_continuous(
-            self.reference, discountinuous_curve
+        self.assertFalse(
+            GeometryChecker.assert_continuous(self.reference, discountinuous_curve)
         )
 
         continuous_curve = CubicBezierCurve(
             Point(30, 30), Point(50, 10),
             Point(50, 30), Point(50, 30)
         )
-        assert GeometryChecker.assert_continuous(
-            self.reference, continuous_curve
+        self.assertTrue(
+            GeometryChecker.assert_continuous(self.reference, continuous_curve)
         )
 
     def test_2(self):
@@ -80,14 +80,18 @@ class TestCurveChecker(unittest.TestCase):
             Point(2, 5),
             Point(4, 13)
         ]
-        assert GeometryChecker.assert_collinear(*collinear)
+        self.assertTrue(
+            GeometryChecker.assert_collinear(*collinear)
+        )
 
         noncollinear = [
             Point(1, 1),
             Point(2, 5),
             Point(11, 43)
         ]
-        assert not GeometryChecker.assert_collinear(*noncollinear)
+        self.assertFalse(
+            GeometryChecker.assert_collinear(*noncollinear)
+        )
 
     def test_3(self):
         """ Test assert_differentiable """
@@ -95,33 +99,37 @@ class TestCurveChecker(unittest.TestCase):
             Point(30, 30), Point(50, 10),
             Point(50, 30), Point(50, 30)
         )
-        assert not GeometryChecker.assert_differentiable(
-            self.reference, nondifferentiable_curve
+        self.assertFalse(
+            GeometryChecker.assert_differentiable(self.reference, nondifferentiable_curve)
         )
 
         differentiable_curve = CubicBezierCurve(
             Point(30, 30), Point(10, 50),
             Point(30, 50), Point(30, 50)
         )
-        assert GeometryChecker.assert_differentiable(
-            self.reference, differentiable_curve
+        self.assertTrue(
+            GeometryChecker.assert_differentiable(self.reference, differentiable_curve)
         )
 
 
 class TestSVGPathConverter(unittest.TestCase):
     """ SVGPathConverter tests """
-    pass
-    # def test_1(self):
-    #     curve1 = CubicBezierCurve(
-    #         Point(10, 30), Point(30, 30),
-    #         Point(10, 10), Point(30, 10)
-    #     )
-    #     curve2 = CubicBezierCurve(
-    #         Point(30, 30), Point(10, 50),
-    #         Point(30, 50), Point(30, 50)
-    #     )
-    #     path = Path([curve1, curve2])
-    #     SVGPathConverter.path_to_string(path)
+    def test_1(self):
+        """ Test Path to SVG string conversion """
+        target_string = "M 10 30 C 10 10 30 10 30 30 C 30 50 30 50 10 50"
+        curve1 = CubicBezierCurve(
+            Point(10, 30), Point(30, 30),
+            Point(10, 10), Point(30, 10)
+        )
+        curve2 = CubicBezierCurve(
+            Point(30, 30), Point(10, 50),
+            Point(30, 50), Point(30, 50)
+        )
+        path = Path([curve1, curve2])
+        self.assertEqual(
+            target_string,
+            SVGPathConverter.path_to_string(path)
+        )
 
 
 if __name__ == '__main__':
