@@ -67,7 +67,7 @@ class Path(List[CubicBezierCurve]):
 
 
 ##############################
-#
+# Functional Things          #
 ##############################
 
 
