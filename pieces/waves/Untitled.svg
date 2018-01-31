@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" width="500" height="500" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <path d="M 750 343 A 200 200 0 0 1 550 543 A 200 200 0 0 1 350 343 A 200 200 0 0 1 550 143 A 200 200 0 0 1 750 343 Z" style="stroke: rgb(0, 0, 0); fill: none;" transform="matrix(1, 0.00004500000432017259, -0.00004500000432017259, 1, -299.9755554199219, -93.01575469970703)" bx:origin="0 0"/>
+</svg>

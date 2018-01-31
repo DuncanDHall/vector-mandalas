@@ -28,9 +28,9 @@ class Point:
         self.x = x
         self.y = y
 
-    def copy(self, x_offset: int = 0, y_offset: int = 0):  # -> Point
+    def copy(self):  # -> Point
         """ Returns a copy of this object with optional x and y offset """
-        return Point(self.x + x_offset, self.y + y_offset)
+        return Point(self.x, self.y)
 
     def __eq__(self, o: object) -> bool:
         """ Allow __eq__ for point comparison """

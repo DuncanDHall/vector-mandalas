@@ -16,10 +16,6 @@ class TestPoint(unittest.TestCase):
         p2 = p1.copy()
         self.assertIsNot(p1, p2)
 
-        p3 = p1.copy(2, 2)
-        self.assertEqual(3, p3.x)
-        self.assertEqual(4, p3.y)
-
 
 class TestCubicBezierCurve(unittest.TestCase):
     """ Cubic bezier curve tests """
