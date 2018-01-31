@@ -1,7 +1,7 @@
 """
 .. module:: bezier
     :platform: OS X
-    :synopsis: module for creation of cool vector graphics
+    :synopsis: module for creation of bezier paths and export to SVG files
 
 .. moduleauthor:: Duncan Hall
 """
@@ -53,7 +53,7 @@ class CubicBezierCurve:
         self.p1 = p1
         self.p2 = p2
         self.c1 = c1 if c1 is not None else p1
-        self.c2 = c2 if c2 is not None else c2
+        self.c2 = c2 if c2 is not None else p2
 
 
 class Path(List[CubicBezierCurve]):
@@ -64,7 +64,17 @@ class Path(List[CubicBezierCurve]):
         Right now this is literally a list, but there may be more specific
         functionality called for in the future. It would also be really
         nice to be able to specify a type hint here... """
-    pass
+    @classmethod
+    def from_ints(cls, *ints):
+        """ Alternate initializer for compact input of coordinates """
+        curves = []
+        for i in range(0, len(ints)-2, 6):
+            p1 = Point(ints[i], ints[i+1])
+            c1 = Point(ints[i+2], ints[i+3])
+            c2 = Point(ints[i+4], ints[i+5])
+            p2 = Point(ints[i+6], ints[i+7])
+            curves.append(CubicBezierCurve(p1, p2, c1, c2))
+        return cls(curves)
 
 
 ##############################
@@ -160,3 +170,4 @@ def path_to_string(path: Path) -> str:
         pieces.append(piece)
 
     return " ".join(pieces)
+
