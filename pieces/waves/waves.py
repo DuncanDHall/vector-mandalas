@@ -2,7 +2,7 @@
 from __future__ import division
 
 from vector_mandalas import bezier
-from typing import Tuple, List, Iterable
+from typing import Tuple, List
 
 from vector_mandalas.bezier import Point, CubicBezierCurve
 
@@ -54,7 +54,7 @@ def split_curve(curve: CubicBezierCurve, splits: List[float]) -> List[CubicBezie
 
     Args:
         curve (CubicBezierCurve): original curve to be split
-        splits Iterable(float): a list set of values between 0.0 and 1.0 where splits
+        splits (List[float]): a list set of values between 0.0 and 1.0 where splits
             should occur along the curve (not directly correlated with length)
     """
     if not splits:
