@@ -1,13 +1,11 @@
 """ A experimental piece for testing the code from this repo. """
 from __future__ import division
-
-from vector_mandalas import bezier
 from typing import Tuple, List
 
-from vector_mandalas.bezier import Point, CubicBezierCurve
+from vector_mandalas.bezier import CubicBezierCurve, Point, Path
 
 
-def gen_circle(center: Tuple[float, float], r: float) -> bezier.Path:
+def gen_circle(center: Tuple[float, float], r: float) -> Path:
     """ Creates an approximation of a circle with four bezier curves using
         calculations from here: http://spencermortensen.com/articles/bezier-circle/
 
@@ -32,7 +30,7 @@ def gen_circle(center: Tuple[float, float], r: float) -> bezier.Path:
 
         curves.append(CubicBezierCurve(*curve_points))
 
-    return bezier.Path(curves)
+    return Path(curves)
 
 
 def intermediate_point(p1: Point, p2: Point, s: float) -> Point:

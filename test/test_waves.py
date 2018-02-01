@@ -1,18 +1,18 @@
 import unittest
 
-from vector_mandalas import bezier
-from vector_mandalas.bezier import CubicBezierCurve, Point
-from pieces.waves import waves
-
 import svgwrite
+
+from vector_mandalas import bezier
+from vector_mandalas.bezier import CubicBezierCurve, Path, Point
+from vector_mandalas import waves
 
 
 class TestWaves(unittest.TestCase):
     def test_circle_gen(self):
-        circle: bezier.Path = waves.gen_circle((100, 100), 50)
+        circle: Path = waves.gen_circle((100, 100), 50)
         circle_string = bezier.path_to_string(circle)
 
-        dwg = svgwrite.Drawing('pieces/test/drawings/test_circle.svg', size=(200, 200), profile='tiny')
+        dwg = svgwrite.Drawing('./drawings/test_circle.svg', size=(200, 200), profile='tiny')
         dwg.stroke(color=svgwrite.rgb(80, 100, 120), width=1)
 
         dwg.add(dwg.path(d=circle_string, fill="none"))
@@ -39,12 +39,12 @@ class TestWaves(unittest.TestCase):
         three_curves = waves.split_curve(curve, [0.2, 0.6])
         self.assertEqual(3, len(three_curves))
 
-        dwg = svgwrite.Drawing('pieces/test/drawings/test_split.svg', size=(200, 200), profile='tiny')
+        dwg = svgwrite.Drawing('./drawings/test_split.svg', size=(200, 200), profile='tiny')
         dwg.stroke(color=svgwrite.rgb(80, 100, 120), width=1)
 
-        dwg.add(dwg.path(d=bezier.path_to_string(bezier.Path([curve])), fill="none"))
-        dwg.add(dwg.path(d=bezier.path_to_string(bezier.Path(two_curves)), fill="none"))
-        dwg.add(dwg.path(d=bezier.path_to_string(bezier.Path(three_curves)), fill="none"))
+        dwg.add(dwg.path(d=bezier.path_to_string(Path([curve])), fill="none"))
+        dwg.add(dwg.path(d=bezier.path_to_string(Path(two_curves)), fill="none"))
+        dwg.add(dwg.path(d=bezier.path_to_string(Path(three_curves)), fill="none"))
 
         dwg.save()
 
