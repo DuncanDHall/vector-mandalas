@@ -44,18 +44,18 @@ Point = Tuple[float, float]
 class CubicBezierCurve:
     """ Describes a cubic bezier curve with two endpoints
         and two control points """
-    def __init__(self, p1: Point, p2: Point, c1: Point = None, c2: Point = None) -> None:
+    def __init__(self, p0: Point, p1: Point, c0: Point = None, c1: Point = None) -> None:
         """ Initialization of each point
         Args:
-            p1 (Point): first endpoint
-            p2 (Point): second endpoint
-            c1 (Point): first control point (defaults to p1)
-            c2 (Point): second control point (defaults to p2)
+            p0 (Point): first endpoint
+            p1 (Point): second endpoint
+            c0 (Point): first control point (defaults to p1)
+            c1 (Point): second control point (defaults to p2)
         """
+        self.p0 = p0
         self.p1 = p1
-        self.p2 = p2
+        self.c0 = c0 if c0 is not None else p0
         self.c1 = c1 if c1 is not None else p1
-        self.c2 = c2 if c2 is not None else p2
 
 
 class Path(List[CubicBezierCurve]):
@@ -97,7 +97,7 @@ def assert_continuous(*curves: CubicBezierCurve) -> bool:
 
     previous_curve = curves[0]
     for curve in curves[1:]:
-        if previous_curve.p2 != curve.p1:
+        if previous_curve.p1 != curve.p0:
             return False
         previous_curve = curve
     return True
@@ -120,10 +120,11 @@ def assert_collinear(*points: Point, tolerance: float = 1e-2) -> bool:
     if len(points) < 3:
         raise ValueError("CurveChecker.assert_collinear() must be called with at least three points")
 
-    for p1, p2, p3 in zip(points, points[1:], points[2:]):
-        d12 = np.hypot(p1[0]-p2[0], p1[1]-p2[1])
-        d23 = np.hypot(p2[0]-p3[0], p2[1]-p3[1])
-        d31 = np.hypot(p3[0]-p1[0], p3[1]-p1[1])
+    for p0, p1, p2 in zip(points, points[1:], points[2:]):
+
+        d12 = np.hypot(p0[0] - p1[0], p0[1] - p1[1])
+        d23 = np.hypot(p1[0] - p2[0], p1[1] - p2[1])
+        d31 = np.hypot(p2[0] - p0[0], p2[1] - p0[1])
 
         theta = np.arccos(0.5 * (d12/d23 + d23/d12 - d31**2/(d12*d23)))
         if np.pi - theta > tolerance:
@@ -145,8 +146,8 @@ def assert_differentiable(*curves: CubicBezierCurve) -> bool:
     if not assert_continuous(*curves):
         return False
 
-    for curve1, curve2 in zip(curves, curves[1:]):
-        if not assert_collinear(curve1.c2, curve2.p1, curve2.c1):
+    for curve0, curve1 in zip(curves, curves[1:]):
+        if not assert_collinear(curve0.c1, curve1.p0, curve1.c0):
             return False
     return True
 
@@ -162,12 +163,12 @@ def path_to_string(path: Path) -> str:
     """
     assert_continuous(path)
 
-    pieces = ["M {} {}".format(path[0].p1[0], path[0].p1[1])]
+    pieces = ["M {} {}".format(path[0].p0[0], path[0].p0[1])]
     for curve in iter(path):  # iter cast not strictly necessary
         piece = "C {} {} {} {} {} {}".format(
+            int(round(curve.c0[0])), int(round(curve.c0[1])),
             int(round(curve.c1[0])), int(round(curve.c1[1])),
-            int(round(curve.c2[0])), int(round(curve.c2[1])),
-            int(round(curve.p2[0])), int(round(curve.p2[1]))
+            int(round(curve.p1[0])), int(round(curve.p1[1]))
         )
         pieces.append(piece)
 

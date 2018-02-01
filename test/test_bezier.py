@@ -28,10 +28,10 @@ class TestCubicBezierCurve(unittest.TestCase):
     def test_1(self):
         """ Line creation """
         linear_curve = bezier.CubicBezierCurve(self.start, self.end)
+        self.assertIsNotNone(linear_curve.p0)
         self.assertIsNotNone(linear_curve.p1)
-        self.assertIsNotNone(linear_curve.p2)
+        self.assertIsNotNone(linear_curve.c0)
         self.assertIsNotNone(linear_curve.c1)
-        self.assertIsNotNone(linear_curve.c2)
 
     def test_2(self):
         """ Quadratic curve creation """
@@ -52,7 +52,7 @@ class TestPath(unittest.TestCase):
             30, 50, 50, 30, 50, 50
         )
 
-        self.assertEqual(31, path[0].p2[0])
+        self.assertEqual(31, path[0].p1[0])
 
 
 class TestCurveChecker(unittest.TestCase):

@@ -2,7 +2,9 @@
 from __future__ import division
 
 from vector_mandalas import bezier
-from typing import Tuple, List
+from typing import Tuple, List, Iterable
+
+from vector_mandalas.bezier import Point, CubicBezierCurve
 
 
 def gen_circle(center: Tuple[float, float], r: float) -> bezier.Path:
@@ -28,19 +30,49 @@ def gen_circle(center: Tuple[float, float], r: float) -> bezier.Path:
             for p in curve_template
         ]
 
-        curves.append(bezier.CubicBezierCurve(*curve_points))
+        curves.append(CubicBezierCurve(*curve_points))
 
     return bezier.Path(curves)
 
 
-def split_curve(curve: bezier.CubicBezierCurve, splits: List[float]) -> List[bezier.CubicBezierCurve]:
+def intermediate_point(p1: Point, p2: Point, s: float) -> Point:
+    """ Calculates the collinear point proportionally between p1 and p2 with ratio r
+
+    Args:
+        p1 (Point): first point (s = 0.0)
+        p2 (Point): second point (s = 1.0)
+        s (float): the ratio between 0.0 and 1.0 inclusive to use
+    """
+    x = p1[0] * (1.0 - s) + p2[0] * s
+    y = p1[1] * (1.0 - s) + p2[1] * s
+    return x, y
+
+
+def split_curve(curve: CubicBezierCurve, splits: List[float]) -> List[CubicBezierCurve]:
     """ Splits a bezier curve into two or more sub curves which trace the same
         path (with some rounding)
 
     Args:
-        curve (bezier.CubicBezierCurve): original curve to be split
-        splits List(float): a list set of values between 0.0 and 1.0 where splits
+        curve (CubicBezierCurve): original curve to be split
+        splits Iterable(float): a list set of values between 0.0 and 1.0 where splits
             should occur along the curve (not directly correlated with length)
     """
-    # TODO:
-    return [curve]
+    if not splits:
+        return [curve]
+
+    s = splits[0]
+    rest_splits = list(map(lambda x: (x-s)/(1-s), splits[1:]))
+
+    m0: Point = intermediate_point(curve.p0, curve.c0, s)
+    m1: Point = intermediate_point(curve.c0, curve.c1, s)
+    m2: Point = intermediate_point(curve.c1, curve.p1, s)
+
+    q0: Point = intermediate_point(m0, m1, s)
+    q1: Point = intermediate_point(m1, m2, s)
+
+    e: Point = intermediate_point(q0, q1, s)
+
+    first_curve = CubicBezierCurve(curve.p0, e, m0, q0)
+    rest_curve = CubicBezierCurve(e, curve.p1, q1, m2)
+
+    return [first_curve] + split_curve(rest_curve, rest_splits)
