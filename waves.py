@@ -25,6 +25,13 @@ FILE_Name = "base.svg"
 
 def main() -> None:
 
+    # collect paths for each layer here
+    layers = []
+
+    ##############################
+    # Base Circle                #
+    ##############################
+
     plain_circle: Path = waves.gen_circle(
         (CANVAS_SIZE[0] / 2, CANVAS_SIZE[1] / 2),
         DIAMETER_RATIO * CANVAS_SIZE[0] / 2
@@ -36,14 +43,25 @@ def main() -> None:
     for i, curve in enumerate(plain_circle):
         base_curves += waves.split_curve(curve, quarter_splits)
 
-    base_circle = Path(base_curves)
+    layers.append(Path(base_curves))
+
+    ##############################
+    # Control Variation          #
+    ##############################
+
+
+
+    ##############################
+    # Final Drawing              #
+    ##############################
 
     dwg = svgwrite.Drawing(
         os.path.join('./drawings/', FILE_Name),
         size=CANVAS_SIZE, profile='tiny'
     )
     dwg.stroke(color=LINE_COLOR, width=1)
-    dwg.add(dwg.path(d=bezier.path_to_string(base_circle), fill="none"))
+    for path in layers:
+        dwg.add(dwg.path(d=bezier.path_to_string(path), fill="none"))
     dwg.save()
 
 
