@@ -7,9 +7,11 @@
 """
 
 from __future__ import division
-from typing import List
+from typing import List, Tuple
 
 import numpy as np
+
+Point = Tuple[float, float]
 
 
 ##############################
@@ -17,26 +19,26 @@ import numpy as np
 ##############################
 
 
-class Point:
-    """ Describes a point in 2D cartesian space """
-    def __init__(self, x: int, y: int) -> None:
-        """ Initialization of each dimension
-        Args:
-            x (int): int value for horizontal dimension (higher values right)
-            y (int): int value or vertical dimension (higher values bottom)
-        """
-        self.x = x
-        self.y = y
-
-    def copy(self):  # -> Point
-        """ Returns a copy of this object with optional x and y offset """
-        return Point(self.x, self.y)
-
-    def __eq__(self, o: object) -> bool:
-        """ Allow __eq__ for point comparison """
-        if isinstance(o, Point):
-            return self.x == o.x and self.y == o.y
-        return super().__eq__(o)
+# class Point:  # Deprecated
+#     """ Describes a point in 2D cartesian space """
+#     def __init__(self, x: int, y: int) -> None:
+#         """ Initialization of each dimension
+#         Args:
+#             x (int): int value for horizontal dimension (higher values right)
+#             y (int): int value or vertical dimension (higher values bottom)
+#         """
+#         self.x = x
+#         self.y = y
+#
+#     def copy(self):  # -> Point
+#         """ Returns a copy of this object with optional x and y offset """
+#         return Point(self.x, self.y)
+#
+#     def __eq__(self, o: object) -> bool:
+#         """ Allow __eq__ for point comparison """
+#         if isinstance(o, Point):
+#             return self.x == o.x and self.y == o.y
+#         return super().__eq__(o)
 
 
 class CubicBezierCurve:
@@ -65,14 +67,14 @@ class Path(List[CubicBezierCurve]):
         functionality called for in the future. It would also be really
         nice to be able to specify a type hint here... """
     @classmethod
-    def from_ints(cls, *ints):
+    def from_floats(cls, *floats):
         """ Alternate initializer for compact input of coordinates """
         curves = []
-        for i in range(0, len(ints)-2, 6):
-            p1 = Point(ints[i], ints[i+1])
-            c1 = Point(ints[i+2], ints[i+3])
-            c2 = Point(ints[i+4], ints[i+5])
-            p2 = Point(ints[i+6], ints[i+7])
+        for i in range(0, len(floats) - 2, 6):
+            p1 = (floats[i], floats[i + 1])
+            c1 = (floats[i + 2], floats[i + 3])
+            c2 = (floats[i + 4], floats[i + 5])
+            p2 = (floats[i + 6], floats[i + 7])
             curves.append(CubicBezierCurve(p1, p2, c1, c2))
         return cls(curves)
 
@@ -119,9 +121,9 @@ def assert_collinear(*points: Point, tolerance: float = 1e-2) -> bool:
         raise ValueError("CurveChecker.assert_collinear() must be called with at least three points")
 
     for p1, p2, p3 in zip(points, points[1:], points[2:]):
-        d12 = np.hypot(p1.x-p2.x, p1.y-p2.y)
-        d23 = np.hypot(p2.x-p3.x, p2.y-p3.y)
-        d31 = np.hypot(p3.x-p1.x, p3.y-p1.y)
+        d12 = np.hypot(p1[0]-p2[0], p1[1]-p2[1])
+        d23 = np.hypot(p2[0]-p3[0], p2[1]-p3[1])
+        d31 = np.hypot(p3[0]-p1[0], p3[1]-p1[1])
 
         theta = np.arccos(0.5 * (d12/d23 + d23/d12 - d31**2/(d12*d23)))
         if np.pi - theta > tolerance:
@@ -160,12 +162,12 @@ def path_to_string(path: Path) -> str:
     """
     assert_continuous(path)
 
-    pieces = ["M {} {}".format(path[0].p1.x, path[0].p1.y)]
+    pieces = ["M {} {}".format(path[0].p1[0], path[0].p1[1])]
     for curve in iter(path):  # iter cast not strictly necessary
         piece = "C {} {} {} {} {} {}".format(
-            curve.c1.x, curve.c1.y,
-            curve.c2.x, curve.c2.y,
-            curve.p2.x, curve.p2.y
+            int(round(curve.c1[0])), int(round(curve.c1[1])),
+            int(round(curve.c2[0])), int(round(curve.c2[1])),
+            int(round(curve.p2[0])), int(round(curve.p2[1]))
         )
         pieces.append(piece)
 

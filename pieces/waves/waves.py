@@ -1,9 +1,11 @@
 """ A experimental piece for testing the code from this repo. """
+from __future__ import division
+
 from vector_mandalas import bezier
-from typing import Tuple
+from typing import Tuple, List
 
 
-def gen_circle(center: Tuple[int, int], r: int) -> bezier.Path:
+def gen_circle(center: Tuple[float, float], r: float) -> bezier.Path:
     """ Creates an approximation of a circle with four bezier curves using
         calculations from here: http://spencermortensen.com/articles/bezier-circle/
 
@@ -22,10 +24,23 @@ def gen_circle(center: Tuple[int, int], r: int) -> bezier.Path:
     curves = []
     for curve_template in circle_template:
         curve_points = [
-            bezier.Point(int(round(p[0]*r + center[0])), int(round(p[1]*r + center[1])))
+            (p[0]*r + center[0], p[1]*r + center[1])
             for p in curve_template
         ]
 
         curves.append(bezier.CubicBezierCurve(*curve_points))
 
     return bezier.Path(curves)
+
+
+def split_curve(curve: bezier.CubicBezierCurve, splits: List[float]) -> List[bezier.CubicBezierCurve]:
+    """ Splits a bezier curve into two or more sub curves which trace the same
+        path (with some rounding)
+
+    Args:
+        curve (bezier.CubicBezierCurve): original curve to be split
+        splits List(float): a list set of values between 0.0 and 1.0 where splits
+            should occur along the curve (not directly correlated with length)
+    """
+    # TODO:
+    return [curve]

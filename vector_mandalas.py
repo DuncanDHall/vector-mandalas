@@ -7,11 +7,11 @@ if __name__ == "__main__":
 
     linear_path = bezier.Path([
         bezier.CubicBezierCurve(
-            bezier.Point(20, 20), bezier.Point(180, 180)
+            (20, 20), (180, 180)
         )
     ])
 
-    cubic_path = bezier.Path.from_ints([
+    cubic_path = bezier.Path.from_floats([
         20, 20,
         10, 100, 10, 100, 100, 100,
         180, 100, 180, 100, 180, 180
