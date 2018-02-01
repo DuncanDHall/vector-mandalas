@@ -8,11 +8,9 @@ import svgwrite
 
 
 class TestWaves(unittest.TestCase):
-    def test_1(self):
-        """ Circle generation """
+    def test_circle_gen(self):
         circle: bezier.Path = waves.gen_circle((100, 100), 50)
         circle_string = bezier.path_to_string(circle)
-        print(circle_string)
 
         dwg = svgwrite.Drawing('pieces/test/drawings/test_circle.svg', size=(200, 200), profile='tiny')
         dwg.stroke(color=svgwrite.rgb(80, 100, 120), width=1)
@@ -21,23 +19,7 @@ class TestWaves(unittest.TestCase):
 
         dwg.save()
 
-    def test_2(self):
-        """ sanity check """
-        curve = bezier.Path.from_floats(
-            50, 100,
-            50, 50, 150, 150, 150, 100
-        )
-        curve_string = bezier.path_to_string(curve)
-
-        dwg = svgwrite.Drawing('pieces/test/drawings/test_curve.svg', size=(200, 200), profile='tiny')
-        dwg.stroke(color=svgwrite.rgb(80, 100, 120), width=1)
-
-        dwg.add(dwg.path(d=curve_string, fill="none"))
-
-        dwg.save()
-
-    def test_3(self):
-        """ Intermediate point """
+    def test_intermediate_point(self):
         p1: Point = (0.0, 0.0)
         p2: Point = (8.0, 6.0)
 
@@ -47,8 +29,7 @@ class TestWaves(unittest.TestCase):
         intermediate: Point = waves.intermediate_point(p1, p2, 0.25)
         self.assertEqual((2.0, 1.5), intermediate)
 
-    def test_4(self):
-        """ Curve splitting """
+    def test_curve_split(self):
         curve = CubicBezierCurve(
             (50, 50), (150, 50),
             (75, 25), (125, 25),
