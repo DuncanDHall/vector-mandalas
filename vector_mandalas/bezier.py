@@ -109,9 +109,6 @@ def assert_collinear(*points: Point, tolerance: float = 1e-2) -> bool:
         points; three actually collinear points passed with the middle point as
         the first or last argument will return `False`
 
-        Much appreciation to phrogz.net/angle-between-three-points for the
-        method of angle calculation.
-
     Args:
         *points (Point): the points to be compared
         tolerance (float): the error tolerance in radians between adjacent
@@ -120,14 +117,9 @@ def assert_collinear(*points: Point, tolerance: float = 1e-2) -> bool:
     if len(points) < 3:
         raise ValueError("CurveChecker.assert_collinear() must be called with at least three points")
 
-    for p0, p1, p2 in zip(points, points[1:], points[2:]):
-
-        d12 = np.hypot(p0[0] - p1[0], p0[1] - p1[1])
-        d23 = np.hypot(p1[0] - p2[0], p1[1] - p2[1])
-        d31 = np.hypot(p2[0] - p0[0], p2[1] - p0[1])
-
-        theta = np.arccos(0.5 * (d12/d23 + d23/d12 - d31**2/(d12*d23)))
-        if np.pi - theta > tolerance:
+    thetas = [np.arctan2(p0[1] - p1[1], p0[0] - p1[0]) for p0, p1 in zip(points, points[1:])]
+    for t0, t1 in zip(thetas, thetas[1:]):
+        if abs(t0 - t1) > tolerance:
             return False
 
     return True

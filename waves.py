@@ -2,8 +2,8 @@ import numpy as np
 import svgwrite
 import os
 
-from vector_mandalas import bezier, waves
-from vector_mandalas.bezier import Path
+from vector_mandalas import bezier, waves_helper
+from vector_mandalas.bezier import Path, Point
 
 
 ##############################
@@ -19,10 +19,6 @@ LINE_COLOR = svgwrite.rgb(80, 100, 120)
 FILE_Name = "base.svg"
 
 
-##############################
-# Magic Happens Here         #
-##############################
-
 def main() -> None:
 
     # collect paths for each layer here
@@ -32,7 +28,7 @@ def main() -> None:
     # Base Circle                #
     ##############################
 
-    plain_circle: Path = waves.gen_circle(
+    plain_circle: Path = waves_helper.gen_circle(
         (CANVAS_SIZE[0] / 2, CANVAS_SIZE[1] / 2),
         DIAMETER_RATIO * CANVAS_SIZE[0] / 2
     )
@@ -41,12 +37,12 @@ def main() -> None:
     base_curves = []
 
     for i, curve in enumerate(plain_circle):
-        base_curves += waves.split_curve(curve, quarter_splits)
+        base_curves += waves_helper.split_curve(curve, quarter_splits)
 
     layers.append(Path(base_curves))
 
     ##############################
-    # Control Variation          #
+    # Control Variations         #
     ##############################
 
 

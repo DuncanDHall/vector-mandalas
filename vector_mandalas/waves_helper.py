@@ -2,6 +2,8 @@
 from __future__ import division
 from typing import Tuple, List
 
+import numpy as np
+
 from vector_mandalas.bezier import CubicBezierCurve, Point, Path
 
 
@@ -74,3 +76,37 @@ def split_curve(curve: CubicBezierCurve, splits: List[float]) -> List[CubicBezie
     rest_curve = CubicBezierCurve(e, curve.p1, q1, m2)
 
     return [first_curve] + split_curve(rest_curve, rest_splits)
+
+
+def vary_point(
+        point: Point, p: float, max_distance: float, reference_point: Point = None, reference_factor: float = 0.0
+) -> Point:
+    """ Varies the first input point with probability p and outputs a second
+        Point. The point's variation can be skewed towards the reference using
+        the reference_factor.
+
+    Args:
+        point (Point): point to be varied
+        p (float): probability of a variation occuring (ranges 0.0 <= p <= 1.0)
+        max_distance (float): max distance to vary the point
+        reference_point (Point): the target direction for skewing the variation
+        reference_factor (float): degree of skew toward the reference_point
+            (ranges 0.0 <= reference_factor <= 1.0)
+    """
+    if p > 1.0:
+        raise ValueError("p must be a probability on the closed interval [0.0, 1.0]")
+    if reference_factor > 1.0:
+        raise ValueError("reference_factor must be a probability on the closed interval [0.0, 1.0]")
+
+    if np.random.random() >= p:
+        return point
+
+    theta: float = (np.random.random() * 2 - 1) * np.pi * (1.0 - reference_factor)
+    if reference_point is not None:
+        theta += np.arctan2(reference_point[1] - point[1], reference_point[0] - point[0])
+
+    distance: float = np.random.random() * max_distance
+
+    nx: float = np.cos(theta) * distance + point[0]
+    ny: float = np.sin(theta) * distance + point[1]
+    return nx, ny
